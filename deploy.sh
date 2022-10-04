@@ -104,6 +104,10 @@ function grantPriceOracleRole() {
   wait_for_tx $(FROM=$(primary_account) TO="$1" DATA="0x2f2ff15ddd24a0f121e5ab7c3e97c63eaaf859e0b46792c3e0edfd86e2b3ad50f63011d8$(to_abi_address $2)" eth_sendTransaction)
 }
 
+function grantRedistributorRole() {
+  wait_for_tx $(FROM=$(primary_account) TO="$1" DATA="0x2f2ff15d3e35b14a9f4fef84b59f9bdcd3044fc28783144b7e42bfb2cd075e6a02cb0828$(to_abi_address $2)" eth_sendTransaction)
+}
+
 PRIMARY_ACCOUNT=$(primary_account)
 echo found primary account $PRIMARY_ACCOUNT >&2
 
@@ -131,6 +135,8 @@ FACTORY_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA=$PATCHED_FACTORY_
 echo deployed factory to $FACTORY_ADDRESS >&2
 
 grantPriceOracleRole $POSTAGE_STAMP_ADDRESS $PRIMARY_ACCOUNT > /dev/null &
+grantRedistributorRole $POSTAGE_STAMP_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null &
+grantRedistributorRole $STAKING_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null &
 
 for NODEACCOUNT in $BZZACCOUNTS
 do
