@@ -134,9 +134,9 @@ PATCHED_FACTORY_BIN=$(echo $FACTORY_BIN | sed -e "s.__TOKEN_ADDRESS__.$(to_abi_a
 FACTORY_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA=$PATCHED_FACTORY_BIN GAS=3500000 eth_sendTransaction))
 echo deployed factory to $FACTORY_ADDRESS >&2
 
-grantPriceOracleRole $POSTAGE_STAMP_ADDRESS $PRIMARY_ACCOUNT > /dev/null &
-grantRedistributorRole $POSTAGE_STAMP_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null &
-grantRedistributorRole $STAKING_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null &
+grantPriceOracleRole $POSTAGE_STAMP_ADDRESS $PRIMARY_ACCOUNT > /dev/null
+grantRedistributorRole $POSTAGE_STAMP_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null
+grantRedistributorRole $STAKING_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null
 
 for NODEACCOUNT in $BZZACCOUNTS
 do
