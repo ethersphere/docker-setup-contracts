@@ -138,9 +138,6 @@ grantPriceOracleRole $POSTAGE_STAMP_ADDRESS $PRIMARY_ACCOUNT > /dev/null
 grantRedistributorRole $POSTAGE_STAMP_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null
 grantRedistributorRole $STAKING_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null
 
-echo "minting tokens for primary account $PRIMARY_ACCOUNT" >&2
-mint_erc20 $TOKEN_ADDRESS 0x$PRIMARY_ACCOUNT 1000000000000000000 > /dev/null &
-
 for NODEACCOUNT in $BZZACCOUNTS
 do
   echo "minting tokens for $NODEACCOUNT" >&2
