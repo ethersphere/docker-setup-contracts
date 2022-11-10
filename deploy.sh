@@ -128,15 +128,15 @@ echo deployed postage stamp contract to $POSTAGE_STAMP_ADDRESS >&2
 PRICE_ORACLE_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA="${PRICE_ORACLE_BIN}$(to_abi_hex 100000 64)$(to_abi_hex 1 64)" GAS=3500000 eth_sendTransaction))
 echo deployed price oracle contract to $PRICE_ORACLE_ADDRESS >&2
 
+PATCHED_FACTORY_BIN=$(echo $FACTORY_BIN | sed -e "s.__TOKEN_ADDRESS__.$(to_abi_address $TOKEN_ADDRESS).")
+FACTORY_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA=$PATCHED_FACTORY_BIN GAS=3500000 eth_sendTransaction))
+echo deployed factory to $FACTORY_ADDRESS >&2
+
 STAKING_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA="${STAKING_BIN}$(to_abi_address $TOKEN_ADDRESS)$(to_abi_hex 12345 64)" GAS=3500000 eth_sendTransaction))
 echo deployed staking contract to $STAKING_ADDRESS >&2
 
 REDISTRIBUTION_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA="${REDISTRIBUTION_BIN}$(to_abi_address $STAKING_ADDRESS)$(to_abi_address $POSTAGE_STAMP_ADDRESS)$(to_abi_address $PRICE_ORACLE_ADDRESS)" GAS=3500000 eth_sendTransaction))
 echo deployed redistribution contract to $REDISTRIBUTION_ADDRESS >&2
-
-PATCHED_FACTORY_BIN=$(echo $FACTORY_BIN | sed -e "s.__TOKEN_ADDRESS__.$(to_abi_address $TOKEN_ADDRESS).")
-FACTORY_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA=$PATCHED_FACTORY_BIN GAS=3500000 eth_sendTransaction))
-echo deployed factory to $FACTORY_ADDRESS >&2
 
 grantPriceOracleRole $POSTAGE_STAMP_ADDRESS $PRIMARY_ACCOUNT > /dev/null
 grantRedistributorRole $POSTAGE_STAMP_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null
