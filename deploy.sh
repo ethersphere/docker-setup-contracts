@@ -108,6 +108,10 @@ function grantRedistributorRole() {
   wait_for_tx $(FROM=$(primary_account) TO="$1" DATA="0x2f2ff15d3e35b14a9f4fef84b59f9bdcd3044fc28783144b7e42bfb2cd075e6a02cb0828$(to_abi_address $2)" eth_sendTransaction)
 }
 
+function grantPriceUpdaterRole() {
+  wait_for_tx $(FROM=$(primary_account) TO="$1" DATA="0x2f2ff15d74b366a297145849fa9687e16ecad1e3a60cf84f6c2256ae73e20a9f76669804$(to_abi_address $2)" eth_sendTransaction)
+}
+
 PRIMARY_ACCOUNT=$(primary_account)
 echo found primary account $PRIMARY_ACCOUNT >&2
 
@@ -127,7 +131,7 @@ echo deployed price oracle contract to $PRICE_ORACLE_ADDRESS >&2
 STAKING_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA="${STAKING_BIN}$(to_abi_address $TOKEN_ADDRESS)$(to_abi_hex 12345 64)" GAS=3500000 eth_sendTransaction))
 echo deployed staking contract to $STAKING_ADDRESS >&2
 
-REDISTRIBUTION_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA="${REDISTRIBUTION_BIN}$(to_abi_address $STAKING_ADDRESS)$(to_abi_address $POSTAGE_STAMP_ADDRESS)" GAS=3500000 eth_sendTransaction))
+REDISTRIBUTION_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA="${REDISTRIBUTION_BIN}$(to_abi_address $STAKING_ADDRESS)$(to_abi_address $POSTAGE_STAMP_ADDRESS)$(to_abi_address $PRICE_ORACLE_ADDRESS)" GAS=3500000 eth_sendTransaction))
 echo deployed redistribution contract to $REDISTRIBUTION_ADDRESS >&2
 
 PATCHED_FACTORY_BIN=$(echo $FACTORY_BIN | sed -e "s.__TOKEN_ADDRESS__.$(to_abi_address $TOKEN_ADDRESS).")
@@ -137,6 +141,7 @@ echo deployed factory to $FACTORY_ADDRESS >&2
 grantPriceOracleRole $POSTAGE_STAMP_ADDRESS $PRIMARY_ACCOUNT > /dev/null
 grantRedistributorRole $POSTAGE_STAMP_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null
 grantRedistributorRole $STAKING_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null
+grantPriceUpdaterRole $PRICE_ORACLE_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null
 
 for NODEACCOUNT in $BZZACCOUNTS
 do
