@@ -138,10 +138,10 @@ echo deployed staking contract to $STAKING_ADDRESS >&2
 REDISTRIBUTION_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA="${REDISTRIBUTION_BIN}$(to_abi_address $STAKING_ADDRESS)$(to_abi_address $POSTAGE_STAMP_ADDRESS)$(to_abi_address $PRICE_ORACLE_ADDRESS)" GAS=3500000 eth_sendTransaction))
 echo deployed redistribution contract to $REDISTRIBUTION_ADDRESS >&2
 
-grantPriceOracleRole $POSTAGE_STAMP_ADDRESS $PRIMARY_ACCOUNT > /dev/null
-grantRedistributorRole $POSTAGE_STAMP_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null
-grantRedistributorRole $STAKING_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null
-grantPriceUpdaterRole $PRICE_ORACLE_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null
+grantPriceOracleRole $POSTAGE_STAMP_ADDRESS $PRIMARY_ACCOUNT > /dev/null &
+grantRedistributorRole $POSTAGE_STAMP_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null &
+grantRedistributorRole $STAKING_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null &
+grantPriceUpdaterRole $PRICE_ORACLE_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null &
 
 for NODEACCOUNT in $BZZACCOUNTS
 do
