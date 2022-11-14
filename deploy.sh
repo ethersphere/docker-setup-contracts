@@ -135,7 +135,7 @@ FACTORY_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA=$PATCHED_FACTORY_
 echo deployed factory to $FACTORY_ADDRESS >&2
 
 INCENTIVES_PRICE_ORACLE_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA="${INCENTIVES_PRICE_ORACLE_BIN}$(to_abi_address $POSTAGE_STAMP_ADDRESS)" GAS=3500000 eth_sendTransaction))
-echo deployed postage stamp contract to $INCENTIVES_PRICE_ORACLE_ADDRESS >&2
+echo deployed incentives price oracle contract to $INCENTIVES_PRICE_ORACLE_ADDRESS >&2
 
 STAKING_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA="${STAKING_BIN}$(to_abi_hex 12345 64)$(to_abi_address $TOKEN_ADDRESS)" GAS=3500000 eth_sendTransaction))
 echo deployed staking contract to $STAKING_ADDRESS >&2
