@@ -128,7 +128,7 @@ PATCHED_LEGACY_FACTORY_BIN=$(echo $LEGACY_FACTORY_BIN | sed -e "s.__TOKEN_ADDRES
 LEGACY_FACTORY_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA=$PATCHED_LEGACY_FACTORY_BIN GAS=3500000 eth_sendTransaction))
 echo deployed legacy factory to $LEGACY_FACTORY_ADDRESS >&2
 
-POSTAGE_STAMP_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA="${POSTAGE_STAMP_BIN}$(to_abi_address $TOKEN_ADDRESS)$(to_abi_hex 16 8)" GAS=3500000 eth_sendTransaction))
+POSTAGE_STAMP_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA="${POSTAGE_STAMP_BIN}$(to_abi_address $TOKEN_ADDRESS)$(to_abi_hex 16 64)" GAS=3500000 eth_sendTransaction))
 echo deployed postage stamp contract to $POSTAGE_STAMP_ADDRESS >&2
 
 SWAP_PRICE_ORACLE_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA="${SWAP_PRICE_ORACLE_BIN}$(to_abi_hex 100000 64)$(to_abi_hex 1 64)" GAS=3500000 eth_sendTransaction))
