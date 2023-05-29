@@ -118,6 +118,10 @@ function grantPriceUpdaterRole() {
   wait_for_tx $(FROM=$(primary_account) TO="$1" DATA="0x2f2ff15d74b366a297145849fa9687e16ecad1e3a60cf84f6c2256ae73e20a9f76669804$(to_abi_address $2)" eth_sendTransaction)
 }
 
+function changePriceDefault() {
+  wait_for_tx $(FROM=$(primary_account) TO="$1" DATA="0x91b7f5ed00000000000000000000000000000000000000000000000000005dc0" eth_sendTransaction)
+}
+
 PRIMARY_ACCOUNT=$(primary_account)
 echo found primary account $PRIMARY_ACCOUNT >&2
 
@@ -151,6 +155,7 @@ grantPriceOracleRole $POSTAGE_STAMP_ADDRESS $PRIMARY_ACCOUNT > /dev/null &
 grantRedistributorRole $POSTAGE_STAMP_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null &
 grantRedistributorRole $STAKING_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null &
 grantPriceUpdaterRole $INCENTIVES_PRICE_ORACLE_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null &
+changePriceDefault $INCENTIVES_PRICE_ORACLE_ADDRESS > /dev/null &
 
 for NODEACCOUNT in $BZZACCOUNTS
 do
