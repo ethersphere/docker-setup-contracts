@@ -84,6 +84,16 @@ function eth_sendTransaction() {
   [ ! -z ${DATA+x} ] && args="$args --arg data $DATA"
   [ ! -z ${GAS+x} ] && args="$args --arg gas $(to_hex $GAS)"
   jsonrpc eth_sendTransaction "$(jq -n $args '[. + $ARGS.named'])" | jq -r
+  
+}
+
+function eth_call() {
+  local args=''
+  [ ! -z ${FROM+x} ] && args="$args --arg from $FROM"
+  [ ! -z ${TO+x} ] && args="$args --arg to $TO"
+  [ ! -z ${DATA+x} ] && args="$args --arg data $DATA"
+  [ ! -z ${GAS+x} ] && args="$args --arg gas $(to_hex $GAS)"
+  jsonrpc eth_call "$(jq -n $args '[. + $ARGS.named] | . as $tx_call_obj | [$tx_call_obj, "latest"]')" | jq -r
 }
 
 function wait_for_tx() {
@@ -118,8 +128,16 @@ function grantPriceUpdaterRole() {
   wait_for_tx $(FROM=$(primary_account) TO="$1" DATA="0x2f2ff15d74b366a297145849fa9687e16ecad1e3a60cf84f6c2256ae73e20a9f76669804$(to_abi_address $2)" eth_sendTransaction)
 }
 
+function checkPriceOracle() {
+  wait_for_tx $(FROM=$(primary_account) TO="$1" DATA="0x9d1b464a" eth_call)
+}
+
+function checkPriceStamps() {
+  wait_for_tx $(FROM=$(primary_account) TO="$1" DATA="0x10b40aae" eth_call)
+}
+
 function changePriceDefault() {
-  wait_for_tx $(FROM=$(primary_account) TO="$1" DATA="0x91b7f5ed00000000000000000000000000000000000000000000000000005dc0" eth_sendTransaction)
+  wait_for_tx $(FROM=$(POSTAGE_STAMP_ADDRESS) TO="$1" DATA="0x91b7f5ed$(to_abi_address $2)" eth_sendTransaction)
 }
 
 PRIMARY_ACCOUNT=$(primary_account)
@@ -151,11 +169,16 @@ echo deployed staking contract to $STAKING_ADDRESS >&2
 REDISTRIBUTION_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA="${REDISTRIBUTION_BIN}$(to_abi_address $STAKING_ADDRESS)$(to_abi_address $POSTAGE_STAMP_ADDRESS)$(to_abi_address $INCENTIVES_PRICE_ORACLE_ADDRESS)" GAS=3500000 eth_sendTransaction))
 echo deployed redistribution contract to $REDISTRIBUTION_ADDRESS >&2
 
+PRICE_VALUE = 24000
+echo setting Oracle Price to $PRICE_VALUE >&2
+
 grantPriceOracleRole $POSTAGE_STAMP_ADDRESS $PRIMARY_ACCOUNT > /dev/null &
 grantRedistributorRole $POSTAGE_STAMP_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null &
 grantRedistributorRole $STAKING_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null &
 grantPriceUpdaterRole $INCENTIVES_PRICE_ORACLE_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null &
-changePriceDefault $INCENTIVES_PRICE_ORACLE_ADDRESS > /dev/null &
+checkPriceOracle $INCENTIVES_PRICE_ORACLE_ADDRESS > /dev/null &
+checkPriceStamps $POSTAGE_STAMP_ADDRESS > /dev/null &
+changePriceDefault $INCENTIVES_PRICE_ORACLE_ADDRESS $(to_hex $PRICE_VALUE) > /dev/null &
 
 for NODEACCOUNT in $BZZACCOUNTS
 do
@@ -177,3 +200,5 @@ echo export BEE_STAKING_ADDRESS=$STAKING_ADDRESS
 echo export BEE_POSTAGE_STAMP_ADDRESS=$POSTAGE_STAMP_ADDRESS
 echo export BEE_INCENTIVES_PRICE_ORACLE_ADDRESS=$INCENTIVES_PRICE_ORACLE_ADDRESS
 echo export BEE_REDISTRIBUTION_ADDRESS=$REDISTRIBUTION_ADDRESS
+
+
