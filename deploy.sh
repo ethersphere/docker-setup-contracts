@@ -133,7 +133,7 @@ function checkPriceOracle() {
 }
 
 function checkPriceStamps() {
-  wait_for_tx $(FROM=$(primary_account) TO="$1" DATA="0x9d1b464a" eth_call)
+  wait_for_tx $(FROM=$(primary_account) TO="$1" DATA="0x10b40aae" eth_call)
 }
 
 PRIMARY_ACCOUNT=$(primary_account)
@@ -169,7 +169,8 @@ grantPriceOracleRole $POSTAGE_STAMP_ADDRESS $PRIMARY_ACCOUNT > /dev/null &
 grantRedistributorRole $POSTAGE_STAMP_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null &
 grantRedistributorRole $STAKING_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null &
 grantPriceUpdaterRole $INCENTIVES_PRICE_ORACLE_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null &
-checkPriceDefault $INCENTIVES_PRICE_ORACLE_ADDRESS > /dev/null &
+checkPriceOracle $INCENTIVES_PRICE_ORACLE_ADDRESS > /dev/null &
+checkPriceStamps $POSTAGE_STAMP_ADDRESS > /dev/null &
 
 for NODEACCOUNT in $BZZACCOUNTS
 do
