@@ -86,11 +86,10 @@ function eth_sendTransaction() {
   jsonrpc eth_sendTransaction "$(jq -n $args '[. + $ARGS.named'])" | jq -r
 }
 
-function eth_call(){
+function eth_call() {
   local args=''
   [ ! -z ${FROM+x} ] && args="$args --arg from $FROM"
   [ ! -z ${TO+x} ] && args="$args --arg to $TO"
-  [ ! -z ${VALUE+x} ] && args="$args --arg value $(to_hex $VALUE)"
   [ ! -z ${DATA+x} ] && args="$args --arg data $DATA"
   [ ! -z ${GAS+x} ] && args="$args --arg gas $(to_hex $GAS)"
   jsonrpc eth_call "$(jq -n $args '[. + $ARGS.named]')" | jq -r
