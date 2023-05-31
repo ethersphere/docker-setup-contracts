@@ -136,6 +136,10 @@ function checkPriceStamps() {
   wait_for_tx $(FROM=$(primary_account) TO="$1" DATA="0x10b40aae" eth_call)
 }
 
+function changePriceDefault() {
+  wait_for_tx $(FROM=$(POSTAGE_STAMP_ADDRESS) TO="$1" DATA="0x91b7f5ed00000000000000000000000000000000000000000000000000005dc0" eth_sendTransaction)
+}
+
 PRIMARY_ACCOUNT=$(primary_account)
 echo found primary account $PRIMARY_ACCOUNT >&2
 
@@ -171,6 +175,7 @@ grantRedistributorRole $STAKING_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null &
 grantPriceUpdaterRole $INCENTIVES_PRICE_ORACLE_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null &
 checkPriceOracle $INCENTIVES_PRICE_ORACLE_ADDRESS > /dev/null &
 checkPriceStamps $POSTAGE_STAMP_ADDRESS > /dev/null &
+changePriceDefault $INCENTIVES_PRICE_ORACLE_ADDRESS > /dev/null &
 
 for NODEACCOUNT in $BZZACCOUNTS
 do
@@ -192,3 +197,5 @@ echo export BEE_STAKING_ADDRESS=$STAKING_ADDRESS
 echo export BEE_POSTAGE_STAMP_ADDRESS=$POSTAGE_STAMP_ADDRESS
 echo export BEE_INCENTIVES_PRICE_ORACLE_ADDRESS=$INCENTIVES_PRICE_ORACLE_ADDRESS
 echo export BEE_REDISTRIBUTION_ADDRESS=$REDISTRIBUTION_ADDRESS
+
+
