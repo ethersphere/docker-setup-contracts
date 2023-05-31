@@ -84,6 +84,7 @@ function eth_sendTransaction() {
   [ ! -z ${DATA+x} ] && args="$args --arg data $DATA"
   [ ! -z ${GAS+x} ] && args="$args --arg gas $(to_hex $GAS)"
   jsonrpc eth_sendTransaction "$(jq -n $args '[. + $ARGS.named'])" | jq -r
+  
 }
 
 function eth_call() {
@@ -92,7 +93,7 @@ function eth_call() {
   [ ! -z ${TO+x} ] && args="$args --arg to $TO"
   [ ! -z ${DATA+x} ] && args="$args --arg data $DATA"
   [ ! -z ${GAS+x} ] && args="$args --arg gas $(to_hex $GAS)"
-  jsonrpc eth_call "$(jq -n $args '[. + $ARGS.named]')" | jq -r
+  jsonrpc eth_call "$(jq -n $args '[. + $ARGS.named] | . as $tx_call_obj | [$tx_call_obj, "latest"]')" | jq -r
 }
 
 function wait_for_tx() {
