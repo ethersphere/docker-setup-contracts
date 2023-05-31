@@ -86,6 +86,16 @@ function eth_sendTransaction() {
   jsonrpc eth_sendTransaction "$(jq -n $args '[. + $ARGS.named'])" | jq -r
 }
 
+function eth_call(){
+  local args=''
+  [ ! -z ${FROM+x} ] && args="$args --arg from $FROM"
+  [ ! -z ${TO+x} ] && args="$args --arg to $TO"
+  [ ! -z ${VALUE+x} ] && args="$args --arg value $(to_hex $VALUE)"
+  [ ! -z ${DATA+x} ] && args="$args --arg data $DATA"
+  [ ! -z ${GAS+x} ] && args="$args --arg gas $(to_hex $GAS)"
+  jsonrpc eth_call "$(jq -n $args '[. + $ARGS.named]')" | jq -r
+}
+
 function wait_for_tx() {
   local txhash="$1"
   while
@@ -118,7 +128,11 @@ function grantPriceUpdaterRole() {
   wait_for_tx $(FROM=$(primary_account) TO="$1" DATA="0x2f2ff15d74b366a297145849fa9687e16ecad1e3a60cf84f6c2256ae73e20a9f76669804$(to_abi_address $2)" eth_sendTransaction)
 }
 
-function checkPriceDefault() {
+function checkPriceOracle() {
+  wait_for_tx $(FROM=$(primary_account) TO="$1" DATA="0x9d1b464a" eth_call)
+}
+
+function checkPriceStamps() {
   wait_for_tx $(FROM=$(primary_account) TO="$1" DATA="0x9d1b464a" eth_call)
 }
 
