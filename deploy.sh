@@ -137,7 +137,7 @@ function checkPriceStamps() {
 }
 
 function changePriceDefault() {
-  wait_for_tx $(FROM=$(POSTAGE_STAMP_ADDRESS) TO="$1" DATA="0x91b7f5ed00000000000000000000000000000000000000000000000000005dc0" eth_sendTransaction)
+  wait_for_tx $(FROM=$(POSTAGE_STAMP_ADDRESS) TO="$1" DATA="0x91b7f5ed$(to_abi_address $2)" eth_sendTransaction)
 }
 
 PRIMARY_ACCOUNT=$(primary_account)
@@ -169,13 +169,16 @@ echo deployed staking contract to $STAKING_ADDRESS >&2
 REDISTRIBUTION_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA="${REDISTRIBUTION_BIN}$(to_abi_address $STAKING_ADDRESS)$(to_abi_address $POSTAGE_STAMP_ADDRESS)$(to_abi_address $INCENTIVES_PRICE_ORACLE_ADDRESS)" GAS=3500000 eth_sendTransaction))
 echo deployed redistribution contract to $REDISTRIBUTION_ADDRESS >&2
 
+PRICE_VALUE = 24000
+echo setting Oracle Price to $PRICE_VALUE >&2
+
 grantPriceOracleRole $POSTAGE_STAMP_ADDRESS $PRIMARY_ACCOUNT > /dev/null &
 grantRedistributorRole $POSTAGE_STAMP_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null &
 grantRedistributorRole $STAKING_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null &
 grantPriceUpdaterRole $INCENTIVES_PRICE_ORACLE_ADDRESS $REDISTRIBUTION_ADDRESS > /dev/null &
 checkPriceOracle $INCENTIVES_PRICE_ORACLE_ADDRESS > /dev/null &
 checkPriceStamps $POSTAGE_STAMP_ADDRESS > /dev/null &
-changePriceDefault $INCENTIVES_PRICE_ORACLE_ADDRESS > /dev/null &
+changePriceDefault $INCENTIVES_PRICE_ORACLE_ADDRESS $(to_hex $PRICE_VALUE) > /dev/null &
 
 for NODEACCOUNT in $BZZACCOUNTS
 do
