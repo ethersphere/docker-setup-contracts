@@ -139,7 +139,7 @@ PATCHED_FACTORY_BIN=$(echo $FACTORY_BIN | sed -e "s.__TOKEN_ADDRESS__.$(to_abi_a
 FACTORY_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA=$PATCHED_FACTORY_BIN GAS=3500000 eth_sendTransaction))
 echo deployed factory to $FACTORY_ADDRESS >&2
 
-INCENTIVES_PRICE_ORACLE_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA="${INCENTIVES_PRICE_ORACLE_BIN}$(to_abi_address $POSTAGE_STAMP_ADDRESS)" GAS=3500000 eth_sendTransaction))
+INCENTIVES_PRICE_ORACLE_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA="${INCENTIVES_PRICE_ORACLE_BIN}$(to_abi_address $POSTAGE_STAMP_ADDRESS)$(to_abi_address $TOKEN_ADDRESS)" GAS=3500000 eth_sendTransaction))
 echo deployed incentives price oracle contract to $INCENTIVES_PRICE_ORACLE_ADDRESS >&2
 
 STAKING_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA="${STAKING_BIN}$(to_abi_address $TOKEN_ADDRESS)$(to_abi_hex 12345 64)" GAS=3500000 eth_sendTransaction))
