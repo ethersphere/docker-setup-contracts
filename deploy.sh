@@ -125,8 +125,7 @@ echo found primary account $PRIMARY_ACCOUNT >&2
 TOKEN_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA=$TOKEN_BIN GAS=3500000 eth_sendTransaction))
 echo deployed token to $TOKEN_ADDRESS >&2
 
-PATCHED_LEGACY_FACTORY_BIN=$(echo $LEGACY_FACTORY_BIN | sed -e "s.__TOKEN_ADDRESS__.$(to_abi_address $TOKEN_ADDRESS).")
-LEGACY_FACTORY_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA=$PATCHED_LEGACY_FACTORY_BIN GAS=3500000 eth_sendTransaction))
+LEGACY_FACTORY_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA=$LEGACY_FACTORY_BIN GAS=3500000 eth_sendTransaction))
 echo deployed legacy factory to $LEGACY_FACTORY_ADDRESS >&2
 
 POSTAGE_STAMP_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA="${POSTAGE_STAMP_BIN}$(to_abi_address $TOKEN_ADDRESS)$(to_abi_hex 16 64)$(to_abi_address $PRIMARY_ACCOUNT)" GAS=3500000 eth_sendTransaction))
@@ -135,8 +134,7 @@ echo deployed postage stamp contract to $POSTAGE_STAMP_ADDRESS >&2
 SWAP_PRICE_ORACLE_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA="${SWAP_PRICE_ORACLE_BIN}$(to_abi_hex 100000 64)$(to_abi_hex 1 64)" GAS=3500000 eth_sendTransaction))
 echo deployed swap price oracle contract to $SWAP_PRICE_ORACLE_ADDRESS >&2
 
-PATCHED_FACTORY_BIN=$(echo $FACTORY_BIN | sed -e "s.__TOKEN_ADDRESS__.$(to_abi_address $TOKEN_ADDRESS).")
-FACTORY_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA=$PATCHED_FACTORY_BIN GAS=3500000 eth_sendTransaction))
+FACTORY_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA=$FACTORY_BIN GAS=3500000 eth_sendTransaction))
 echo deployed factory to $FACTORY_ADDRESS >&2
 
 INCENTIVES_PRICE_ORACLE_ADDRESS=$(wait_for_deploy $(FROM=$PRIMARY_ACCOUNT DATA="${INCENTIVES_PRICE_ORACLE_BIN}$(to_abi_address $POSTAGE_STAMP_ADDRESS)$(to_abi_address $PRIMARY_ACCOUNT)" GAS=3500000 eth_sendTransaction))
