@@ -5,8 +5,6 @@ set -u
 set -o errtrace
 set -o pipefail
 
-echo "THIS IS A DEBUG TEST!"
-
 readonly ENV_FILE=".abi_testnet.env"
 [ ! -f ${ENV_FILE} ] && printf "file %s does not exist\n" "${ENV_FILE}" && exit 1
 source "${ENV_FILE}"
